@@ -1,0 +1,25 @@
+{
+  "name": "websockets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:frontend": "parcel index.html",
+    "start:ws": "npm run nodemon:json && nodemon --config node_modules/nodemon.json src/ws/index.ts",
+    "start:rest": "npm run nodemon:json && nodemon --config node_modules/nodemon.json src/rest/index.ts",
+    "start:kv": "npm run nodemon:json && nodemon --config node_modules/nodemon.json src/keyval/index.ts",
+    "start:pubsub": "npm run nodemon:json && nodemon --config node_modules/nodemon.json src/pubsub/index.ts",
+    "start:db": "npm run nodemon:json && nodemon --config node_modules/nodemon.json src/database/index.ts",
+    "nodemon:json": "envsubst < nodemon.json.tmpl > node_modules/nodemon.json",
+    "start": "tsc && node dist/pubsub/client.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "nodemon": "^2.0.15",
+    "parcel": "^2.3.2",
+    "typescript": "^4.5.5"
+  }
+}

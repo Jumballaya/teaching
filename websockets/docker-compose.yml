@@ -1,0 +1,117 @@
+version: '3'
+
+services:
+
+  keyvalue:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:kv" ]
+    container_name: keyvalue
+    environment:
+      PORT: 9090
+      HOST: 0.0.0.0
+      NODE_FOLDER: keyval
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  database:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:db" ]
+    container_name: database
+    environment:
+      PORT: 27127
+      HOST: 0.0.0.0
+      NODE_FOLDER: database
+    restart: always
+    ports:
+      - 27127:27127
+    volumes:
+      - ./.data:/app/.data
+      - ./:/app
+      - /app/node_modules
+
+  pubsub:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:pubsub" ]
+    container_name: pubsub
+    environment:
+      PORT: 4567
+      HOST: 0.0.0.0
+      NODE_FOLDER: pubsub
+    restart: always
+    ports:
+      - 4567:4567
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  websocket:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:ws" ]
+    container_name: websocket
+    depends_on:
+      - keyvalue
+      - pubsub
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      NODE_FOLDER: ws
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  rest:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:rest" ]
+    container_name: rest
+    depends_on:
+      - keyvalue
+      - websocket
+      - database
+      - pubsub
+    environment:
+      PORT: 8080
+      HOST: 0.0.0.0
+      NODE_FOLDER: rest
+      JWT_SECRET: abcd
+      JWT_EXPIRES_IN: 60000
+    restart: always
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: [ "npm", "run", "start:frontend" ]
+    container_name: frontend
+    depends_on:
+      - keyvalue
+      - websocket
+      - rest
+    restart: always
+    ports:
+      - 1234:1234
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.parcel-cache

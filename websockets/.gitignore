@@ -1,0 +1,6 @@
+nodemon.json
+node_modules/
+dist/
+.vscode/
+.parcel-cache/
+.data/
